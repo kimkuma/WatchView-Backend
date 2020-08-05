@@ -1,0 +1,10 @@
+server:
+  port: 8888
+
+spring:
+  data:
+    mongodb:
+      database: watchdb
+      host: kuma04.iptime.org
+      password: watchview
+      port: 27017

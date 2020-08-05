@@ -1,4 +1,2 @@
-include ':backend'
-include ':orm'
 
 rootProject.name = 'wathchview'
