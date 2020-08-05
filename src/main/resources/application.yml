@@ -6,5 +6,7 @@ spring:
     mongodb:
       database: watchdb
       host: kuma04.iptime.org
+      username: watch
       password: watchview
       port: 27017
+
