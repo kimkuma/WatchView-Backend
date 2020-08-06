@@ -13,7 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Configuration
-public class RouterConfig {
+public class RouterFunctionConfig {
 
     @Autowired
     EmployeeMongoRepository employeeDb;
@@ -22,6 +22,7 @@ public class RouterConfig {
     public RouterFunction<ServerResponse> findAll() {  //find 라는 get방식이 요청오면 동작하는 메소드
 
         final RequestPredicate predicate = RequestPredicates.GET("/find").and(RequestPredicates.accept(MediaType.TEXT_PLAIN));
+
         RouterFunction<ServerResponse> response = RouterFunctions.route(predicate, (request)->{
             Flux<Employee> mapper = employeeDb.findAll();  //만들어준 전체 조회 메소드
 
