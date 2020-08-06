@@ -1,6 +1,8 @@
+#서버포트 설정
 server:
   port: 8888
 
+#DB 정보설정
 spring:
   data:
     mongodb:
@@ -9,4 +11,9 @@ spring:
       username: watch
       password: watchview
       port: 27017
+
+#Movie API URL 및 Key
+movieapi:
+  url: https://api.themoviedb.org/3/
+  key: 91dca598b37fb1b0af948aa2f50ed2d0
 
