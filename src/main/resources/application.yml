@@ -12,6 +12,15 @@ spring:
       password: watchview
       port: 27017
 
+#logging
+logging:
+  file:
+    path: logs
+  level:
+    root: info
+    com.movie.watchview: debug
+    org.springframework.web.reactive.function.client.ExchangeFunctions: DEBUG
+
 #Movie API URL 및 Key
 movieapi:
   url: https://api.themoviedb.org/3/

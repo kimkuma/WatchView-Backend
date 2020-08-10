@@ -1,29 +1,62 @@
 package com.movie.wathchview.config;
 
 import com.movie.wathchview.domain.Employee;
-import com.movie.wathchview.handler.FirstHandler;
+import com.movie.wathchview.domain.MoviePopular;
 import com.movie.wathchview.repository.EmployeeMongoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
+import static org.springframework.web.reactive.function.server.RouterFunctions.route;
+
 @Configuration
 public class RouterFunctionConfig {
 
-    @Autowired
-    EmployeeMongoRepository employeeDb;
+    private final EmployeeMongoRepository employeeDb;
+
+    private final WebClient webClient;
+
+    @Value("${movieapi.key}")
+    private String key;
+
+    @Value("${movieapi.url}")
+    private String url;
+
+    public RouterFunctionConfig(EmployeeMongoRepository employeeDb, WebClient webClient) {
+        this.employeeDb = employeeDb;
+        this.webClient = webClient;
+    }
+
+    @Bean
+    public RouterFunction<?> function() {
+        return route(GET("/design"), this::postTaco);
+                //.andRoute();
+    }
+
+    public Mono<ServerResponse> postTaco(ServerRequest request) {
+
+        return ServerResponse.ok().body(webClient.mutate()
+                .baseUrl(url)
+                .build()
+                .get()
+                .uri("/movie/popular?api_key={key}&language=ko&page=1&region=kr",key)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve().bodyToMono(MoviePopular.class),MoviePopular.class);
+    }
 
     @Bean
     public RouterFunction<ServerResponse> findAll() {  //find 라는 get방식이 요청오면 동작하는 메소드
 
-        final RequestPredicate predicate = RequestPredicates.GET("/find").and(RequestPredicates.accept(MediaType.TEXT_PLAIN));
+        final RequestPredicate predicate = GET("/find").and(RequestPredicates.accept(MediaType.TEXT_PLAIN));
 
-        RouterFunction<ServerResponse> response = RouterFunctions.route(predicate, (request)->{
+        RouterFunction<ServerResponse> response = route(predicate, (request)->{
             Flux<Employee> mapper = employeeDb.findAll();  //만들어준 전체 조회 메소드
 
             employeeDb.findByEname("good").collectList().subscribe(System.out::println);  //만들어준 단일 검색
@@ -50,7 +83,7 @@ public class RouterFunctionConfig {
 //                    .subscribe(System.out::println);
 
             //위 내용을 토대로 응답은 아래처럼 해 주면 된다.
-            Mono<ServerResponse> res = ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromProducer(mapper, Employee.class));
+            Mono<ServerResponse> res = ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromProducer( mapper,MoviePopular.class));
             return res;
         });
 
