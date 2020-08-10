@@ -36,19 +36,22 @@ public class RouterFunctionConfig {
 
     @Bean
     public RouterFunction<?> function() {
-        return route(GET("/design"), this::postTaco);
+        return route(GET("/searchMovie"), this::searchMovie);
                 //.andRoute();
     }
 
-    public Mono<ServerResponse> postTaco(ServerRequest request) {
+    public Mono<ServerResponse> searchMovie(ServerRequest request) {
 
-        return ServerResponse.ok().body(webClient.mutate()
-                .baseUrl(url)
-                .build()
-                .get()
-                .uri("/movie/popular?api_key={key}&language=ko&page=1&region=kr",key)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve().bodyToMono(MoviePopular.class),MoviePopular.class);
+        return ServerResponse.ok().body(
+            webClient
+                    .mutate()
+                    .baseUrl(url)
+                    .build()
+                    .get()
+                    .uri("/movie/popular?api_key={key}&language=ko&page=1&region=kr",key)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve().bodyToMono(MoviePopular.class),MoviePopular.class
+        );
     }
 
     @Bean
