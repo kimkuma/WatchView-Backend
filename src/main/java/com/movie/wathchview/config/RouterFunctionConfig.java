@@ -3,6 +3,7 @@ package com.movie.wathchview.config;
 import com.movie.wathchview.domain.Employee;
 import com.movie.wathchview.domain.MoviePopular;
 import com.movie.wathchview.repository.EmployeeMongoRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,10 +14,13 @@ import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
+@Slf4j
 public class RouterFunctionConfig {
 
     private final EmployeeMongoRepository employeeDb;
@@ -36,11 +40,14 @@ public class RouterFunctionConfig {
 
     @Bean
     public RouterFunction<?> function() {
-        return route(GET("/searchMovie"), this::searchMovie);
+//        path에 파라미터가 담겼을때
+//        return route(GET("/searchMovie/{id}"), this::searchMovie);
                 //.andRoute();
+        return route(GET("/searchMovie"), this::searchMovie);
     }
 
     public Mono<ServerResponse> searchMovie(ServerRequest request) {
+        //String a = request.pathVariable("id");path에 파라미터가 담겼을때
 
         return ServerResponse.ok().body(
             webClient
