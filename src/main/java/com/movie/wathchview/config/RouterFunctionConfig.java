@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
+import static org.springframework.web.reactive.function.server.EntityResponse.fromObject;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -48,9 +49,11 @@ public class RouterFunctionConfig {
 
     public Mono<ServerResponse> searchMovie(ServerRequest request) {
         //String a = request.pathVariable("id");path에 파라미터가 담겼을때
+        String name = request.queryParam("name").orElse("무명");
+        log.info("parameter = {}", name);
 
         return ServerResponse.ok().body(
-            webClient
+                webClient
                     .mutate()
                     .baseUrl(url)
                     .build()
