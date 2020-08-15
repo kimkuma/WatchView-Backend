@@ -22,9 +22,6 @@ import reactor.netty.http.client.HttpClient;
 @Slf4j
 public class WebClientConfig {
 
-    @Value("${movieapi.url}")
-    private String url;
-
     @Bean
     public WebClient webClient() {
 
