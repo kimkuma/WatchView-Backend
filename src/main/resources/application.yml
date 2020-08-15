@@ -21,8 +21,9 @@ logging:
     com.movie.watchview: debug
     org.springframework.web.reactive.function.client.ExchangeFunctions: DEBUG
 
-#Movie API URL 및 Key
+#Movie API (url, key, imagepath)
 movieapi:
   url: https://api.themoviedb.org/3/
   key: 91dca598b37fb1b0af948aa2f50ed2d0
+  imagepath: https://image.tmdb.org/t/p/w500/
 
