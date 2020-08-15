@@ -14,9 +14,6 @@ import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
-import static org.springframework.web.reactive.function.server.EntityResponse.fromObject;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -49,19 +46,22 @@ public class RouterFunctionConfig {
 
     public Mono<ServerResponse> searchMovie(ServerRequest request) {
         //String a = request.pathVariable("id");path에 파라미터가 담겼을때
-        String name = request.queryParam("name").orElse("무명");
-        log.info("parameter = {}", name);
+        String query = request.queryParam("name").orElse("");
 
-        return ServerResponse.ok().body(
+        Mono<ServerResponse> res = ServerResponse.ok().body(
                 webClient
-                    .mutate()
-                    .baseUrl(url)
-                    .build()
-                    .get()
-                    .uri("/movie/popular?api_key={key}&language=ko&page=1&region=kr",key)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .retrieve().bodyToMono(MoviePopular.class),MoviePopular.class
+                        .mutate()
+                        .baseUrl(url)
+                        .build()
+                        .get()
+                        .uri("/search/movie?api_key={key}&language=ko&region=KR&query={name}",key, query)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .retrieve().bodyToMono(
+                                MoviePopular.class
+                ), Employee.class
         );
+
+        return res;
     }
 
     @Bean
