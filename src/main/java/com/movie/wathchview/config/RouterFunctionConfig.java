@@ -3,6 +3,7 @@ package com.movie.wathchview.config;
 import com.movie.wathchview.domain.Employee;
 import com.movie.wathchview.domain.Movie;
 import com.movie.wathchview.repository.EmployeeMongoRepository;
+import com.movie.wathchview.repository.MovieMongoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,8 @@ public class RouterFunctionConfig {
 
     private final WebClient webClient;
 
+    private final MovieMongoRepository movieDb;
+
     @Value("${movieapi.key}")
     private String key;
 
@@ -33,8 +36,9 @@ public class RouterFunctionConfig {
     private String url;
 
     @Autowired
-    public RouterFunctionConfig(EmployeeMongoRepository employeeDb, WebClient webClient) {
+    public RouterFunctionConfig(EmployeeMongoRepository employeeDb, MovieMongoRepository movieDb, WebClient webClient) {
         this.employeeDb = employeeDb;
+        this.movieDb = movieDb;
         this.webClient = webClient;
     }
 
@@ -49,6 +53,8 @@ public class RouterFunctionConfig {
     public Mono<ServerResponse> searchMovie(ServerRequest request) {
 
         String query = request.queryParam("name").orElse("");
+        movieDb.findByTitle(".*"+query+".*").collectList().subscribe(System.out::println);
+
 
         Mono<ServerResponse> res = ServerResponse.ok().body(
                 webClient
