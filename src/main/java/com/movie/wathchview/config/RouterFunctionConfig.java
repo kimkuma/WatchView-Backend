@@ -1,9 +1,10 @@
 package com.movie.wathchview.config;
 
 import com.movie.wathchview.domain.Employee;
-import com.movie.wathchview.domain.MoviePopular;
+import com.movie.wathchview.domain.Movie;
 import com.movie.wathchview.repository.EmployeeMongoRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,7 @@ public class RouterFunctionConfig {
     @Value("${movieapi.url}")
     private String url;
 
+    @Autowired
     public RouterFunctionConfig(EmployeeMongoRepository employeeDb, WebClient webClient) {
         this.employeeDb = employeeDb;
         this.webClient = webClient;
@@ -45,7 +47,7 @@ public class RouterFunctionConfig {
     }
 
     public Mono<ServerResponse> searchMovie(ServerRequest request) {
-        //String a = request.pathVariable("id");path에 파라미터가 담겼을때
+
         String query = request.queryParam("name").orElse("");
 
         Mono<ServerResponse> res = ServerResponse.ok().body(
@@ -57,7 +59,7 @@ public class RouterFunctionConfig {
                         .uri("/search/movie?api_key={key}&language=ko&region=KR&query={name}",key, query)
                         .accept(MediaType.APPLICATION_JSON)
                         .retrieve().bodyToMono(
-                                MoviePopular.class
+                                Movie.class
                 ), Employee.class
         );
 
@@ -96,7 +98,7 @@ public class RouterFunctionConfig {
 //                    .subscribe(System.out::println);
 
             //위 내용을 토대로 응답은 아래처럼 해 주면 된다.
-            Mono<ServerResponse> res = ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromProducer( mapper,MoviePopular.class));
+            Mono<ServerResponse> res = ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromProducer( mapper, Movie.class));
             return res;
         });
 

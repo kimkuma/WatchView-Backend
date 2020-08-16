@@ -14,10 +14,8 @@ import java.util.List;
 
 
 @Data
-@Document(collection="moviepopular")
-@NoArgsConstructor
-@AllArgsConstructor
-public class MoviePopular implements Serializable {
+@Document(collection="movie")
+public class Movie implements Serializable {
     private static final long serialVersionUID = -2829033005578753232L;
 
     @Id
