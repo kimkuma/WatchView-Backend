@@ -16,6 +16,8 @@ import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -53,20 +55,63 @@ public class RouterFunctionConfig {
     public Mono<ServerResponse> searchMovie(ServerRequest request) {
 
         String query = request.queryParam("name").orElse("");
-        movieDb.findByTitle(".*"+query+".*").collectList().subscribe(System.out::println);
 
+        movieDb.findByTitleLike(query).collectList().subscribe(
+                movieList -> {
+                    // DB 조회시 데이터가 없으면 인서트 처리
+                    if(movieList.size() == 0) {
+                        webClient
+                                .mutate()
+                                .baseUrl(url)
+                                .build()
+                                .get()
+                                .uri("/search/movie?api_key={key}&language=ko&region=KR&query={name}",key, query)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .retrieve().bodyToMono(
+                                    Movie.class
+                        ).subscribe(
+                                movie -> {
+                                    movie.getResults().forEach(
+                                            ds -> {
+                                                movie.setTitle((String) ds.get("title")); // 제목
+                                                movie.setOriginalTitle((String) ds.get("original_title")); //원제목
+                                                movie.setAdult((Boolean) ds.get("adult"));  // 성인여부
+                                                movie.setPosterPath((String) ds.get("poster_path"));
+                                                movie.setBackDropPath((String) ds.get("backdrop_path"));
+                                                movie.setMovieDbId((Integer) ds.get("id")); // movidbId
+                                                movie.setPopularity((Double) ds.get("popularity")); //인기
+                                                movie.setVideo((Boolean) ds.get("video")); //비디오출시여
+                                                movie.setVoteCount((Integer) ds.get("vote_count"));// 추천수
+                                                movie.setVoteAverage(String.valueOf(ds.get("vote_average")) ); // 평점
+                                                movie.setReleaseDate((String) ds.get("release_date")); // 개봉
+                                                movie.setOriginalLanguage((String) ds.get("original_language"));
+                                                movie.setOverView((String) ds.get("overview")); //줄거리
+                                                movie.setGenreIds((List<Integer>) ds.get("genre_ids"));
+                                                movie.setResults(null);
+                                                //인서트 처리
+                                                movieDb.insert(movie).subscribe();
+                                            }
+                                    );
+                                }
+                        );
+                    }
+                }
+        );
 
-        Mono<ServerResponse> res = ServerResponse.ok().body(
-                webClient
-                        .mutate()
-                        .baseUrl(url)
-                        .build()
-                        .get()
-                        .uri("/search/movie?api_key={key}&language=ko&region=KR&query={name}",key, query)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .retrieve().bodyToMono(
-                                Movie.class
-                ), Employee.class
+        Flux<Movie> movie = movieDb.findByTitleLike(query);
+
+        Mono<ServerResponse> res = ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(
+                BodyInserters.fromProducer( movie, Movie.class)
+//                webClient
+//                        .mutate()
+//                        .baseUrl(url)
+//                        .build()
+//                        .get()
+//                        .uri("/search/movie?api_key={key}&language=ko&region=KR&query={name}",key, query)
+//                        .accept(MediaType.APPLICATION_JSON)
+//                        .retrieve().bodyToMono(
+//                                Movie.class
+//                        ), Employee.class
         );
 
         return res;
