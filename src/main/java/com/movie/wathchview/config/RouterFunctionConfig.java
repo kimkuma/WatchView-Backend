@@ -37,6 +37,9 @@ public class RouterFunctionConfig {
     @Value("${movieapi.url}")
     private String url;
 
+    @Value("${movieapi.imagepath}")
+    private String imagepath;
+
     @Autowired
     public RouterFunctionConfig(EmployeeMongoRepository employeeDb, MovieMongoRepository movieDb, WebClient webClient) {
         this.employeeDb = employeeDb;
@@ -76,8 +79,8 @@ public class RouterFunctionConfig {
                                                 movie.setTitle((String) ds.get("title")); // 제목
                                                 movie.setOriginalTitle((String) ds.get("original_title")); //원제목
                                                 movie.setAdult((Boolean) ds.get("adult"));  // 성인여부
-                                                movie.setPosterPath((String) ds.get("poster_path"));
-                                                movie.setBackDropPath((String) ds.get("backdrop_path"));
+                                                movie.setPosterPath(imagepath + (String) ds.get("poster_path"));
+                                                movie.setBackDropPath(imagepath + (String) ds.get("backdrop_path"));
                                                 movie.setMovieDbId((Integer) ds.get("id")); // movidbId
                                                 movie.setPopularity((Double) ds.get("popularity")); //인기
                                                 movie.setVideo((Boolean) ds.get("video")); //비디오출시여
