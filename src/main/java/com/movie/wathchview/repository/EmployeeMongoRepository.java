@@ -12,7 +12,5 @@ public interface EmployeeMongoRepository extends ReactiveMongoRepository<Employe
 
     Flux<Employee> findByEname(String ename);
 
-//    @Query("{'text': {$regex: ?0 }}")
-//    Flux<MyDocument> findRegexByText(String text);  //내가만든 like 모양의 조회 메소드
 }
 
