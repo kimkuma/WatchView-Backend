@@ -17,6 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
@@ -75,25 +76,7 @@ public class RouterFunctionConfig {
                         ).subscribe(
                                 movie -> {
                                     movie.getResults().forEach(
-                                            ds -> {
-                                                movie.setTitle((String) ds.get("title")); // 제목
-                                                movie.setOriginalTitle((String) ds.get("original_title")); //원제목
-                                                movie.setAdult((Boolean) ds.get("adult"));  // 성인여부
-                                                movie.setPosterPath(imagepath + (String) ds.get("poster_path"));
-                                                movie.setBackDropPath(imagepath + (String) ds.get("backdrop_path"));
-                                                movie.setMovieDbId((Integer) ds.get("id")); // movidbId
-                                                movie.setPopularity((Double) ds.get("popularity")); //인기
-                                                movie.setVideo((Boolean) ds.get("video")); //비디오출시여
-                                                movie.setVoteCount((Integer) ds.get("vote_count"));// 추천수
-                                                movie.setVoteAverage(String.valueOf(ds.get("vote_average")) ); // 평점
-                                                movie.setReleaseDate((String) ds.get("release_date")); // 개봉
-                                                movie.setOriginalLanguage((String) ds.get("original_language"));
-                                                movie.setOverView((String) ds.get("overview")); //줄거리
-                                                movie.setGenreIds((List<Integer>) ds.get("genre_ids"));
-                                                movie.setResults(null);
-                                                //인서트 처리
-                                                movieDb.insert(movie).subscribe();
-                                            }
+                                            movieData -> this.MovieDataInsert(movie, movieData)
                                     );
                                 }
                         );
@@ -104,7 +87,7 @@ public class RouterFunctionConfig {
         Flux<Movie> movie = movieDb.findByTitleLike(query);
 
         Mono<ServerResponse> res = ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(
-                BodyInserters.fromProducer( movie, Movie.class)
+                 movie, Movie.class
 //                webClient
 //                        .mutate()
 //                        .baseUrl(url)
@@ -118,6 +101,31 @@ public class RouterFunctionConfig {
         );
 
         return res;
+    }
+
+    /**
+     * MovieAPI 에서 조회된 값을  DB 에 Insert
+     * @param movie
+     * @param getMovieApiData
+     */
+    public void MovieDataInsert(Movie movie, Map<String,Object> getMovieApiData ) {
+        movie.setTitle((String) getMovieApiData.get("title")); // 제목
+        movie.setOriginalTitle((String) getMovieApiData.get("original_title")); //원제목
+        movie.setAdult((Boolean) getMovieApiData.get("adult"));  // 성인여부
+        movie.setPosterPath(imagepath + (String) getMovieApiData.get("poster_path"));
+        movie.setBackDropPath(imagepath + (String) getMovieApiData.get("backdrop_path"));
+        movie.setMovieDbId((Integer) getMovieApiData.get("id")); // movidbId
+        movie.setPopularity((Double) getMovieApiData.get("popularity")); //인기
+        movie.setVideo((Boolean) getMovieApiData.get("video")); //비디오출시여
+        movie.setVoteCount((Integer) getMovieApiData.get("vote_count"));// 추천수
+        movie.setVoteAverage(String.valueOf(getMovieApiData.get("vote_average")) ); // 평점
+        movie.setReleaseDate((String) getMovieApiData.get("release_date")); // 개봉
+        movie.setOriginalLanguage((String) getMovieApiData.get("original_language"));
+        movie.setOverView((String) getMovieApiData.get("overview")); //줄거리
+        movie.setGenreIds((List<Integer>) getMovieApiData.get("genre_ids"));
+        movie.setResults(null);
+        //인서트 처리
+        movieDb.insert(movie).subscribe();
     }
 
     @Bean
