@@ -25,5 +25,5 @@ logging:
 movieapi:
   url: https://api.themoviedb.org/3/
   key: 91dca598b37fb1b0af948aa2f50ed2d0
-  imagepath: https://image.tmdb.org/t/p/w500/
+  imagepath: https://image.tmdb.org/t/p/w500
 

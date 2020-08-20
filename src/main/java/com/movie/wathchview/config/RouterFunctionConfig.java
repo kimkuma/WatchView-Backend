@@ -58,7 +58,7 @@ public class RouterFunctionConfig {
 
     public Mono<ServerResponse> searchMovie(ServerRequest request) {
 
-        String query = request.queryParam("name").orElse("");
+        String query = request.queryParam("keyword").orElse("");
 
         movieDb.findByTitleLike(query).collectList().subscribe(
                 movieList -> {
@@ -112,8 +112,8 @@ public class RouterFunctionConfig {
         movie.setTitle((String) getMovieApiData.get("title")); // 제목
         movie.setOriginalTitle((String) getMovieApiData.get("original_title")); //원제목
         movie.setAdult((Boolean) getMovieApiData.get("adult"));  // 성인여부
-        movie.setPosterPath(imagepath + (String) getMovieApiData.get("poster_path"));
-        movie.setBackDropPath(imagepath + (String) getMovieApiData.get("backdrop_path"));
+        movie.setPosterPath(getMovieApiData.get("poster_path") != null  ? imagepath + (String) getMovieApiData.get("poster_path") : "");
+        movie.setBackDropPath(getMovieApiData.get("backdrop_path") != null ? imagepath + (String) getMovieApiData.get("backdrop_path") : "");
         movie.setMovieDbId((Integer) getMovieApiData.get("id")); // movidbId
         movie.setPopularity((Double) getMovieApiData.get("popularity")); //인기
         movie.setVideo((Boolean) getMovieApiData.get("video")); //비디오출시여
