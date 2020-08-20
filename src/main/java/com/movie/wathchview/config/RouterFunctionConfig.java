@@ -53,7 +53,7 @@ public class RouterFunctionConfig {
 //        path에 파라미터가 담겼을때
 //        return route(GET("/searchMovie/{id}"), this::searchMovie);
                 //.andRoute();
-        return route(GET("/searchMovie"), this::searchMovie);
+        return route(GET("/api/searchMovie"), this::searchMovie);
     }
 
     public Mono<ServerResponse> searchMovie(ServerRequest request) {
