@@ -1,6 +1,6 @@
 #서버포트 설정
 server:
-  port: 8888
+  port: 9999
 
 #DB 정보설정
 spring:

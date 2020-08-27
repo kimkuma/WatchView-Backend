@@ -60,10 +60,13 @@ public class RouterFunctionConfig {
 
         String query = request.queryParam("keyword").orElse("");
 
-        movieDb.findByTitleLike(query).collectList().subscribe(
+        Mono<List<Movie>> movieInfo = movieDb.findByTitleLike(query).collectList();
+
+        movieInfo.subscribe(
                 movieList -> {
                     // DB 조회시 데이터가 없으면 인서트 처리
-                    if(movieList.size() == 0) {
+                    int movieListSize = movieList.size();
+                    if(movieListSize == 0) {
                         webClient
                                 .mutate()
                                 .baseUrl(url)
@@ -71,34 +74,13 @@ public class RouterFunctionConfig {
                                 .get()
                                 .uri("/search/movie?api_key={key}&language=ko&region=KR&query={name}",key, query)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .retrieve().bodyToMono(
-                                    Movie.class
-                        ).subscribe(
-                                movie -> {
-                                    movie.getResults().forEach(
-                                            movieData -> this.MovieDataInsert(movie, movieData)
-                                    );
-                                }
-                        );
+                                .retrieve().bodyToMono(Movie.class)
+                                .subscribe(movie -> movie.getResults().forEach(movieData -> MovieDataInsert(movie, movieData)));
                     }
                 }
         );
 
-        Flux<Movie> movie = movieDb.findByTitleLike(query);
-
-        Mono<ServerResponse> res = ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(
-                 movie, Movie.class
-//                webClient
-//                        .mutate()
-//                        .baseUrl(url)
-//                        .build()
-//                        .get()
-//                        .uri("/search/movie?api_key={key}&language=ko&region=KR&query={name}",key, query)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .retrieve().bodyToMono(
-//                                Movie.class
-//                        ), Employee.class
-        );
+        Mono<ServerResponse> res = ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(movieInfo, Movie.class);
 
         return res;
     }
