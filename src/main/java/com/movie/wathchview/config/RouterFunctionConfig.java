@@ -58,9 +58,9 @@ public class RouterFunctionConfig {
 
     public Mono<ServerResponse> searchMovie(ServerRequest request) {
 
-        String query = request.queryParam("keyword").orElse("");
+        String queryString = request.queryParam("keyword").orElse("");
 
-        Mono<List<Movie>> movieInfo = movieDb.findByTitleLike(query).collectList();
+        Mono<List<Movie>> movieInfo = movieDb.findByTitleLike(queryString).collectList();
 
         movieInfo.subscribe(
                 movieList -> {
@@ -72,7 +72,7 @@ public class RouterFunctionConfig {
                                 .baseUrl(url)
                                 .build()
                                 .get()
-                                .uri("/search/movie?api_key={key}&language=ko&region=KR&query={name}",key, query)
+                                .uri("/search/movie?api_key={key}&language=ko&region=KR&query={name}",key, queryString)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .retrieve().bodyToMono(Movie.class)
                                 .subscribe(movie -> movie.getResults().forEach(movieData -> MovieDataInsert(movie, movieData)));
