@@ -19,7 +19,7 @@ logging:
   level:
     root: info
     com.movie.watchview: debug
-    org.springframework.web.reactive.function.client.ExchangeFunctions: DEBUG
+    org.springframework.web.reactive.function.client.ExchangeFunctions: debug
 
 #Movie API (url, key, imagepath)
 movieapi:
