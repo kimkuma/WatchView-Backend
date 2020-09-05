@@ -58,9 +58,11 @@ public class RouterFunctionConfig {
     }
 
     public Mono<ServerResponse> handleRequest(ServerRequest request) {
-        return sayHello(request).onErrorReturn("Hello Stranger")
-                .flatMap(s -> ServerResponse.ok()
-                        .contentType(MediaType.TEXT_PLAIN).bodyValue(s));
+        return sayHello(request)
+              .onErrorReturn("Hello Stranger")
+              .flatMap(s -> ServerResponse.ok()
+                           .contentType(MediaType.TEXT_PLAIN)
+                           .bodyValue(s));
     }
 
     public Mono<String> sayHello(ServerRequest request) {
