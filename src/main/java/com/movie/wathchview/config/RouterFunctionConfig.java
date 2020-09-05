@@ -53,7 +53,18 @@ public class RouterFunctionConfig {
 //        path에 파라미터가 담겼을때
 //        return route(GET("/searchMovie/{id}"), this::searchMovie);
                 //.andRoute();
-        return route(GET("/api/searchMovie"), this::searchMovie);
+        return route(GET("/"),this::handleRequest).
+               andRoute(GET("/api/searchMovie"), this::searchMovie);
+    }
+
+    public Mono<ServerResponse> handleRequest(ServerRequest request) {
+        return sayHello(request).onErrorReturn("Hello Stranger")
+                .flatMap(s -> ServerResponse.ok()
+                        .contentType(MediaType.TEXT_PLAIN).bodyValue(s));
+    }
+
+    public Mono<String> sayHello(ServerRequest request) {
+        return Mono.just("Hello, WatchView");
     }
 
     public Mono<ServerResponse> searchMovie(ServerRequest request) {
