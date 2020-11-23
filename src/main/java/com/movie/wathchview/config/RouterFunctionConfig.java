@@ -87,14 +87,19 @@ public class RouterFunctionConfig {
                                 .get()
                                 .uri("/search/movie?api_key={key}&language=ko&region=KR&query={name}",key, queryString)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .retrieve().bodyToMono(Movie.class)
+                                .exchange()
+                                .flatMapMany(cr -> cr.bodyToFlux(Movie.class))
                                 .subscribe(movie -> movie.getResults().forEach(movieData -> MovieDataInsert(movie, movieData)));
                     }
                 }
         );
 
-        Mono<ServerResponse> res = ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(movieInfo, Movie.class);
-
+        Mono<ServerResponse> res = ServerResponse
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(
+                    movieInfo,
+                    Movie.class);
         return res;
     }
 
